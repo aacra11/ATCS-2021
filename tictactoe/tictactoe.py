@@ -56,7 +56,7 @@ class TicTacToe:
         if player == 'X':
             self.take_manual_turn(player)
         else:
-            self.take_random_turn(player)
+            self.take_minimax_turn(player)
         self.print_board()
 
     def check_col_win(self, player):
@@ -97,6 +97,50 @@ class TicTacToe:
         if self.check_win('X') == False and self.check_win('O') == False and full == True:
             return True
         return False
+
+    def minimax(self, player):
+        if self.check_win('O'):
+            return (10,None,None)
+        elif self.check_win('X') :
+            return (-10,None,None)
+        elif self.check_tie():
+            return (0,None,None)
+
+        opt_row = -1
+        opt_col = -1
+
+        if player == 'O':
+            best = -10
+            for i in range(len(self.board)):
+                for j in range(len(self.board[0])):
+                    if self.is_valid_move(i,j):
+                        self.place_player(player, i, j)
+                        score = self.minimax('X')[0]
+                        if best < score:
+                            best = score
+                            opt_row = i
+                            opt_col = j
+                        self.place_player('-',i,j)
+            return (best,opt_row,opt_col)
+
+        if player == 'X':
+            worst = 10
+            for i in range(len(self.board)):
+                for j in range(len(self.board[0])):
+                    if self.is_valid_move(i,j):
+                        self.place_player(player, i, j)
+                        score = self.minimax('O')[0]
+                        if worst > score:
+                            worst = score
+                            opt_row = i
+                            opt_col = j
+                        self.place_player('-', i, j)
+            return (worst,opt_row,opt_col)
+
+    def take_minimax_turn(self,player):
+        score, row, col = self.minimax(player)
+        self.place_player(player,row,col)
+        self.print_board()
 
     def play_game(self):
         # TODO: Play game
