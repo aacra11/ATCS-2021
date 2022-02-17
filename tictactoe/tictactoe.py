@@ -1,4 +1,5 @@
 import random
+import time
 
 class TicTacToe:
     def __init__(self):
@@ -138,9 +139,67 @@ class TicTacToe:
 
 
     def take_minimax_turn(self,player,depth):
+        start = time.time()
         score, row, col = self.minimax(player,depth)
+        end = time.time()
         self.place_player(player,row,col)
         self.print_board()
+        print("This turn took " + str(end-start) + " seconds.")
+
+    def minimax_alpha_beta(self,player,depth,alpha,beta):
+        if self.check_win('O'):
+            return (10,None,None)
+        elif self.check_win('X') :
+            return (-10,None,None)
+        elif self.check_tie() or depth == 0:
+            return (0,None,None)
+
+        opt_row = -1
+        opt_col = -1
+
+        if player == 'O':
+            best = -100
+            for i in range(len(self.board)):
+                for j in range(len(self.board[0])):
+                    if self.is_valid_move(i, j):
+                        self.place_player(player, i, j)
+                        score = self.minimax_alpha_beta('X', depth - 1,alpha,beta)[0]
+                        if score > alpha:
+                            alpha = score
+                        if best < score:
+                            best = score
+                            opt_row = i
+                            opt_col = j
+                        self.place_player('-', i, j)
+                        if alpha >= beta:
+                            return (best, opt_row, opt_col)
+            return (best, opt_row, opt_col)
+
+        if player == 'X':
+            worst = 100
+            for i in range(len(self.board)):
+                for j in range(len(self.board[0])):
+                    if self.is_valid_move(i, j):
+                        self.place_player(player, i, j)
+                        score = self.minimax_alpha_beta('O', depth - 1,alpha,beta)[0]
+                        if score < beta:
+                            beta = score
+                        if worst > score:
+                            worst = score
+                            opt_row = i
+                            opt_col = j
+                        self.place_player('-', i, j)
+                        if alpha >= beta:
+                            return (worst, opt_row, opt_col)
+            return (worst, opt_row, opt_col)
+
+    def take_ab_minimax_turn(self,player,depth,alpha,beta):
+        start = time.time()
+        score, row, col = self.minimax_alpha_beta(player, depth,alpha,beta)
+        end = time.time()
+        self.place_player(player, row, col)
+        self.print_board()
+        print("This turn took " + str(end - start) + " seconds.")
 
     def play_game(self):
         # TODO: Play game
