@@ -8,10 +8,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
 
 crimes = pd.read_csv('bostoncrime/crime.csv',encoding="latin1")
+crimes = crimes.replace("",np.nan,inplace=True)
 codes = pd.read_csv('bostoncrime/offense_codes.csv',encoding="latin1")
+crimes.dropna(inplace=True)
 
 def predict_crime(area,latitude,longitude,hour,dayofweek):
-    feature_area = crimes["REPORTING_AREA"].values
+    feature_area = crimes["REPORTING_AREA"].astype(float).values
     feature_latitude = crimes["Lat"].values
     feature_longitude = crimes["Long"].values
     feature_hour = crimes["HOUR"].values
