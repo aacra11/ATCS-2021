@@ -8,17 +8,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
 
 crimes = pd.read_csv('bostoncrime/crime.csv',encoding="latin1")
-crimes = crimes.replace("",np.nan,inplace=True)
+crimes = crimes[["REPORTING_AREA","Lat","Long","HOUR","DAY_OF_WEEK","OFFENSE_CODE"]]
+crimes.replace(" ",np.nan,inplace=True)
 codes = pd.read_csv('bostoncrime/offense_codes.csv',encoding="latin1")
 crimes.dropna(inplace=True)
+print(crimes)
 
 def predict_crime(area,latitude,longitude,hour,dayofweek):
-    feature_area = crimes["REPORTING_AREA"].astype(float).values
+    feature_area = crimes["REPORTING_AREA"].values
     feature_latitude = crimes["Lat"].values
     feature_longitude = crimes["Long"].values
     feature_hour = crimes["HOUR"].values
     feature_dayofweek = crimes["DAY_OF_WEEK"].values
-    class_offense = crimes["OFFENSE_CODE_GROUP"].values
+    class_offense = crimes[["OFFENSE_CODE"]].values
 
     day_transformer = LabelEncoder().fit(feature_dayofweek)
     feature_dayofweek = day_transformer.transform(feature_dayofweek)
@@ -34,7 +36,7 @@ def predict_crime(area,latitude,longitude,hour,dayofweek):
 
     model = KNeighborsClassifier(n_neighbors=2).fit(feattrain, classtrain)
 
-    value = model.predict([area,latitude,longitude,hour,dayofweek])
+    value = model.predict([[area,latitude,longitude,hour,dayofweek]])
     print(value)
 
     # print("Accuracy: ", accuracy_score(classtest, classpred))
